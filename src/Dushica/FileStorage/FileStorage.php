@@ -18,34 +18,42 @@ class FileStorage{
      * Put and save a file in the public directory
      *
      * @param string path of the file
-     * @return string keypath of file
+     * @return mixed keypath of file or false if error occurred during uploading
      */
-    public static function put(UploadedFile $file)
+    public static function putUploadedFile(UploadedFile $file)
     {
-        //Remove all the slashes that doesn't serve
-        FileStorage::clearPublicStartPath();
+        if($file->isValid())
+        {
+            //Remove all the slashes that doesn't serve
+            FileStorage::clearPublicStartPath();
 
-        //Retrive and save the file extension of the file uploaded
-        $fileExtension = $file->getClientOriginalExtension();
+            //Retrive and save the file extension of the file uploaded
+            $fileExtension = $file->getClientOriginalExtension();
 
-        //Save the public path with the start path
-        $absolutePath = public_path().'/'.FileStorage::$publicStartPath;
+            //Save the public path with the start path
+            $absolutePath = public_path().'/'.FileStorage::$publicStartPath;
 
-        //Generate a random name to use for the file uploaded
-        $keyFile = FileStorage::generateKey(FileStorage::$KeyLength).'.'.$fileExtension;
-
-        //Check if the file with the $keyFile name doesn't exist, else, regenerate it
-        while(file_exists($absolutePath.'/'.ord($keyFile[0]).'/'.$keyFile))
+            //Generate a random name to use for the file uploaded
             $keyFile = FileStorage::generateKey(FileStorage::$KeyLength).'.'.$fileExtension;
 
-        //Move the uploaded file and save
-        $file->move($absolutePath.'/'.ord($keyFile[0]), $keyFile);
+            //Check if the file with the $keyFile name doesn't exist, else, regenerate it
+            while(file_exists($absolutePath.'/'.ord($keyFile[0]).'/'.$keyFile))
+                $keyFile = FileStorage::generateKey(FileStorage::$KeyLength).'.'.$fileExtension;
 
-        //Save the keypath (start path, sub path, file name)
-        $keyPath = FileStorage::$publicStartPath.'/'.ord($keyFile[0]).'/'.$keyFile;
+            //Move the uploaded file and save
+            $file->move($absolutePath.'/'.ord($keyFile[0]), $keyFile);
 
-        //Return public path of the file
-        return $keyPath;
+            //Save the keypath (start path, sub path, file name)
+            $keyPath = FileStorage::$publicStartPath.'/'.ord($keyFile[0]).'/'.$keyFile;
+
+            //Return public path of the file
+            return $keyPath;
+        }
+        else
+        {
+            return false;
+        }
+
     }
 
     /**

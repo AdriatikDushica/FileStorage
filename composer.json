@@ -1,6 +1,10 @@
 {
     "name": "dushica/file-storage",
-    "description": "",
+    "type": "library",
+    "description": "Simple library that makes very simple file uploads with Laravel.",
+    "keywords": ["dushica", "laravel", "file", "storage", "filestorage", "upload", "uploaded"],
+    "license": "MIT",
+    "description": "This package ",
     "authors": [
         {
             "name": "Adriatik Dushica",
