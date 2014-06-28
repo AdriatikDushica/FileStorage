@@ -12,7 +12,7 @@ class FileStorage{
     /**
      * The length of the key string associated to the image
      */
-     public static $KeyLength = 32;
+     public static $keyLength = 32;
 
     /**
      * Put and save a file in the public directory
@@ -34,11 +34,11 @@ class FileStorage{
             $absolutePath = public_path().'/'.FileStorage::$publicStartPath;
 
             //Generate a random name to use for the file uploaded
-            $keyFile = FileStorage::generateKey(FileStorage::$KeyLength).'.'.$fileExtension;
+            $keyFile = FileStorage::generateKey(FileStorage::$keyLength).'.'.$fileExtension;
 
             //Check if the file with the $keyFile name doesn't exist, else, regenerate it
             while(file_exists($absolutePath.'/'.ord($keyFile[0]).'/'.$keyFile))
-                $keyFile = FileStorage::generateKey(FileStorage::$KeyLength).'.'.$fileExtension;
+                $keyFile = FileStorage::generateKey(FileStorage::$keyLength).'.'.$fileExtension;
 
             //Move the uploaded file and save
             $file->move($absolutePath.'/'.ord($keyFile[0]), $keyFile);
@@ -64,7 +64,28 @@ class FileStorage{
      */
     public static function delete($keyPath)
     {
-        return unlink($keyPath);
+        //Check if can delete the file
+        if($flag = unlink($keyPath))
+        {
+            $paths = explode('/', $keyPath);
+
+            array_pop($paths);
+
+            $path = implode($paths, '/');
+
+            if(count(scandir($path))==2)
+            {
+                return rmdir($path);
+            }
+            else
+            {
+                return $flag;
+            }
+        }
+        else
+        {
+            return $flag;
+        }
     }
 
     /**
